@@ -1,0 +1,29 @@
+# Environment
+.env
+.env.local
+
+# Python
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+*.pyc
+backend/.pytest_cache/
+backend/.ruff_cache/
+**/*.egg-info/
+
+# Node / frontend
+frontend/node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+
+# Skills (regenerable from skills-lock.json via `npx skills experimental_install`)
+.agents/
+.claude/
