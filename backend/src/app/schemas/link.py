@@ -22,6 +22,13 @@ class LinkCreate(BaseModel):
         TypeAdapter(HttpUrl).validate_python(value)
         return value
 
+    @field_validator("expires_at")
+    @classmethod
+    def validate_expiration_timezone(cls, value: datetime | None) -> datetime | None:
+        if value is not None and value.utcoffset() is None:
+            raise ValueError("expires_at must include a timezone")
+        return value
+
     @field_validator("custom_alias", mode="before")
     @classmethod
     def validate_alias(cls, value: str | None) -> str | None:
