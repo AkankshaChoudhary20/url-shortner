@@ -27,3 +27,20 @@ def test_link_create_with_too_short_alias_raises():
 def test_link_create_with_invalid_url_scheme_raises():
     with pytest.raises(ValidationError):
         LinkCreate(original_url="ftp://example.com")
+
+
+@pytest.mark.parametrize("url", ["https://", "http:///path", "https://[invalid"])
+def test_link_create_rejects_malformed_http_urls(url):
+    with pytest.raises(ValidationError):
+        LinkCreate(original_url=url)
+
+
+@pytest.mark.parametrize("alias", [123, [], "valid\n"])
+def test_link_create_rejects_invalid_alias_types_and_trailing_newlines(alias):
+    with pytest.raises(ValidationError):
+        LinkCreate(original_url="https://example.com", custom_alias=alias)
+
+
+def test_link_create_preserves_valid_destination():
+    url = "https://example.com/a?x=1#section"
+    assert LinkCreate(original_url=url).original_url == url
