@@ -1,7 +1,8 @@
 import re
 from datetime import datetime
+from urllib.parse import urlsplit
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, HttpUrl, TypeAdapter, field_validator
 
 ALIAS_PATTERN = re.compile(r"^[A-Za-z0-9_-]{3,16}$")
 
@@ -16,6 +17,9 @@ class LinkCreate(BaseModel):
     def validate_url(cls, value: str) -> str:
         if not value.startswith(("http://", "https://")):
             raise ValueError("original_url must start with http:// or https://")
+        if not urlsplit(value).hostname:
+            raise ValueError("original_url must include a hostname")
+        TypeAdapter(HttpUrl).validate_python(value)
         return value
 
     @field_validator("custom_alias", mode="before")
@@ -25,7 +29,7 @@ class LinkCreate(BaseModel):
         # clients (including our own frontend) may send either.
         if value is None or value == "":
             return None
-        if not ALIAS_PATTERN.match(value):
+        if not isinstance(value, str) or not ALIAS_PATTERN.fullmatch(value):
             raise ValueError("custom_alias must be 3-16 characters: letters, numbers, - or _")
         return value
 
